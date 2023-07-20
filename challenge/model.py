@@ -8,6 +8,7 @@ import pandas as pd
 import xgboost as xgb
 from datetime import datetime
 from typing import Tuple, Union, List
+from sklearn.utils.validation import check_is_fitted, NotFittedError
 # ================================================================================================
 # DelayModel class
 # ================================================================================================
@@ -44,6 +45,16 @@ class DelayModel:
                 learning_rate=self.__learning_rate, 
                 scale_pos_weight=self.__scale_pos_weight
             )
+    # ============================================================================================
+    # properties
+    # ============================================================================================
+    @property
+    def is_fitted(self):
+        try:
+            check_is_fitted(self._model)
+            return True
+        except NotFittedError:
+            return False
     # ============================================================================================
     # public methods
     # ============================================================================================

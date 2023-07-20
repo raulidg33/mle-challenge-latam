@@ -15,7 +15,25 @@ class TestModel(unittest.TestCase):
         dirpath = os.path.dirname(os.path.realpath(__file__))
         data_filepath = os.path.join(dirpath, '../../data/data.csv')
         self.data = pd.read_csv(filepath_or_buffer=data_filepath, low_memory=False)
-        
+    def test_is_fitted(
+            self
+    ):
+        curpath = os.path.dirname(os.path.realpath(__file__))
+        savpath = os.path.join(curpath, '../../challenge/xgbc.sav')
+        if os.path.exists(savpath):
+            os.remove(savpath)
+        self.model = DelayModel()
+        assert self.model.is_fitted == False
+        features, target = self.model.preprocess(
+            data=self.data,
+            target_column="delay"
+        )
+        self.model.fit(
+            features=features,
+            target=target
+        )
+        assert self.model.is_fitted == True
+
     def test_model_preprocess_for_training(
         self
     ):
