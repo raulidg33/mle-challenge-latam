@@ -10,11 +10,10 @@ class TestModel(unittest.TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        # added option to load from file (optional)
-        self.model = DelayModel(from_file=os.path.exists('xgbc.sav'))
+        self.model = DelayModel()
         # made sure it can find the data.csv no matter where the terminal is
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        data_filepath = os.path.join(dir_path, '../../data/data.csv')
+        dirpath = os.path.dirname(os.path.realpath(__file__))
+        data_filepath = os.path.join(dirpath, '../../data/data.csv')
         self.data = pd.read_csv(filepath_or_buffer=data_filepath, low_memory=False)
         
     def test_model_preprocess_for_training(

@@ -8,8 +8,6 @@ import pandas as pd
 import xgboost as xgb
 from datetime import datetime
 from typing import Tuple, Union, List
-from sklearn.exceptions import NotFittedError
-from sklearn.utils.validation import check_is_fitted
 # ================================================================================================
 # DelayModel class
 # ================================================================================================
@@ -19,7 +17,6 @@ class DelayModel:
     # ============================================================================================
     def __init__(
         self,
-        from_file: bool = False
     ):
         self.__selected_features = [
             "OPERA_Latin American Wings",
@@ -33,12 +30,14 @@ class DelayModel:
             "OPERA_Sky Airline",
             "OPERA_Copa Air"
         ]
+        curdir = os.path.dirname(os.path.realpath(__file__))
+        self.__savpath = os.path.join(curdir, 'xgbc.sav')
         self.__threshold_in_minutes = 15
         self.__scale_pos_weight = 4.4402380952380955
         self.__learning_rate = 0.01
         self.__random_state = 1
-        if from_file:
-            self._model = joblib.load('xgbc.sav')
+        if os.path.exists(self.__savpath):
+            self._model = joblib.load(self.__savpath)
         else:
             self._model = xgb.XGBClassifier(
                 random_state=self.__random_state,
@@ -90,7 +89,7 @@ class DelayModel:
             target (pd.DataFrame): target.
         """
         self._model.fit(features, target)
-        joblib.dump(self._model, "xgbc.sav")
+        joblib.dump(self._model, self.__savpath)
     # -------------------------------------------------------------------------------
     def predict(
         self,
