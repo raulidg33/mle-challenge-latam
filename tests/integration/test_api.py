@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from fastapi.testclient import TestClient
@@ -7,8 +8,15 @@ from challenge import app
 class TestBatchPipeline(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
-        
+    def test_health(self):
+        response = self.client.get('/health')
+        self.assertEqual(response.status_code, 200)
+
     def test_should_get_predict(self):
+        curpath = os.path.dirname(os.path.realpath(__file__))
+        savpath = os.path.join(curpath, '../../challenge/xgbc.sav')
+        if os.path.exists(savpath):
+            os.remove(savpath)
         data = {
             "flights": [
                 {
@@ -23,6 +31,20 @@ class TestBatchPipeline(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"predict": [0]})
     
+    def test_predict_withoud_savfile(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas", 
+                    "TIPOVUELO": "N", 
+                    "MES": 3
+                }
+            ]
+        }
+        # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0])) # change this line to the model of chosing
+        response = self.client.post("/predict", json=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"predict": [0]})
 
     def test_should_failed_unkown_column_1(self):
         data = {       
