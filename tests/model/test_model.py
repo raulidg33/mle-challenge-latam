@@ -1,3 +1,4 @@
+import os
 import unittest
 import pandas as pd
 
@@ -10,8 +11,29 @@ class TestModel(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.model = DelayModel()
-        self.data = pd.read_csv(filepath_or_buffer="../data/data.csv")
-        
+        # made sure it can find the data.csv no matter where the terminal is
+        dirpath = os.path.dirname(os.path.realpath(__file__))
+        data_filepath = os.path.join(dirpath, '../../data/data.csv')
+        self.data = pd.read_csv(filepath_or_buffer=data_filepath, low_memory=False)
+    def test_is_fitted(
+            self
+    ):
+        curpath = os.path.dirname(os.path.realpath(__file__))
+        savpath = os.path.join(curpath, '../../challenge/xgbc.sav')
+        if os.path.exists(savpath):
+            os.remove(savpath)
+        self.model = DelayModel()
+        assert self.model.is_fitted == False
+        features, target = self.model.preprocess(
+            data=self.data,
+            target_column="delay"
+        )
+        self.model.fit(
+            features=features,
+            target=target
+        )
+        assert self.model.is_fitted == True
+
     def test_model_preprocess_for_training(
         self
     ):
@@ -21,7 +43,8 @@ class TestModel(unittest.TestCase):
         )
 
         assert isinstance(features, pd.DataFrame)
-        assert features.columns == [
+        # added all() because features.columns is pandas.core.indexes.base.Index
+        assert all(features.columns == [
             "OPERA_Latin American Wings", 
             "MES_7",
             "MES_10",
@@ -32,7 +55,7 @@ class TestModel(unittest.TestCase):
             "MES_11",
             "OPERA_Sky Airline",
             "OPERA_Copa Air"
-        ]
+        ])
         assert isinstance(target, pd.DataFrame)
         assert target.columns == [
             "delay"
@@ -46,7 +69,8 @@ class TestModel(unittest.TestCase):
         )
 
         assert isinstance(features, pd.DataFrame)
-        assert features.columns == [
+        # added all() because features.columns is pandas.core.indexes.base.Index
+        assert all(features.columns == [
             "OPERA_Latin American Wings", 
             "MES_7",
             "MES_10",
@@ -57,7 +81,7 @@ class TestModel(unittest.TestCase):
             "MES_11",
             "OPERA_Sky Airline",
             "OPERA_Copa Air"
-        ]
+        ])
 
     def test_model_fit(
         self
