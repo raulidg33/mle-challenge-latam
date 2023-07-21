@@ -116,11 +116,14 @@ class DelayModel:
         """
         features = pd.concat([
             pd.DataFrame(columns=self.__selected_features),
-            pd.get_dummies(data['OPERA'], prefix = 'OPERA'),
-            pd.get_dummies(data['TIPOVUELO'], prefix = 'TIPOVUELO'),
-            pd.get_dummies(data['MES'], prefix = 'MES')],
-            axis = 1
-        ).fillna(False)
+            pd.concat([
+                pd.get_dummies(data['OPERA'], prefix = 'OPERA'),
+                pd.get_dummies(data['TIPOVUELO'], prefix = 'TIPOVUELO'),
+                pd.get_dummies(data['MES'], prefix = 'MES')],
+                axis = 1
+            ).reset_index(drop=True)], 
+            axis=0
+        ).reset_index(drop=True).fillna(False)
         if not all(column in self.__all_columns for column in features.columns):
             raise ValueError('Unknown column on data.')
         features = features[self.__selected_features]
