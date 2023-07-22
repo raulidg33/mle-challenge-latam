@@ -1,0 +1,4 @@
+runtime: python311
+
+instance_class: F2
+entrypoint: gunicorn -w 1 -k uvicorn.workers.UvicornWorker challenge.api:app --timeout 60
