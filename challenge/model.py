@@ -146,7 +146,10 @@ class DelayModel:
             target (pd.DataFrame): target.
         """
         self._model.fit(features, target)
-        joblib.dump(self._model, self.__savpath)
+        try:
+            joblib.dump(self._model, self.__savpath)
+        except:
+            pass
     # -------------------------------------------------------------------------------
     def predict(
         self,
